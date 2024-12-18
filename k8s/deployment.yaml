@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: create-contacts
+  namespace: tc3
+  labels:
+    app: create-contacts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: create-contacts
+  template:
+    metadata:
+      labels:
+        app: create-contacts
+    spec:
+      containers:
+      - name: create-contacts
+        image: fiaptech3acr.azurecr.io/tc3-create-contact:latest #usar tag e nome do container como variáveis no build para simplificar a reutilização.
+        ports:
+        - containerPort: 8081
+        env:
+        - name: ASPNETCORE_URLS
+          value: "http://+:8081"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: create-contacts-service
+  namespace: tc3
+spec:
+  selector:
+    app: create-contacts
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+  type: ClusterIP
